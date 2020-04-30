@@ -35,6 +35,7 @@ function(avr_add_executable_compilation EXECUTABLE)
 	
 	set(EXECUTABLE_ELF "${EXECUTABLE}.elf")
 	set(EXECUTABLE_HEX "${EXECUTABLE}.hex")
+	set(EXECUTABLE_MAP "${EXECUTABLE}.map")
 	if(PROGRAM_EEPROM)
 		set(EXECUTABLE_EEPROM "${EXECUTABLE}_eeprom.hex")
 	endif(PROGRAM_EEPROM)
@@ -52,7 +53,7 @@ function(avr_add_executable_compilation EXECUTABLE)
 	add_executable(${EXECUTABLE_ELF} ${ARGN})
 	set_target_properties(${EXECUTABLE_ELF} PROPERTIES 
 		COMPILE_FLAGS "-mmcu=${AVR_MCU} -DF_CPU=${MCU_FREQ} ${AVR_CFLAGS}"
-		LINK_FLAGS "-mmcu=${AVR_MCU} ${AVR_LFLAGS}")
+		LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,-Map,${EXECUTABLE_MAP} ${AVR_LFLAGS}")
 
 	# rule for program hex file
 	add_custom_command(OUTPUT ${EXECUTABLE_HEX} 
