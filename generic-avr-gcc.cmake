@@ -6,6 +6,7 @@
 # AVR_PROGRAMMER : programmer type for avrdude
 # AVR_PROGRAMMER_PORT : programmer port for avrdude (OS specific)
 # PROGRAM_EEPROM : enable eeprom programming (doesn't work on arduino)
+# AVR_FUSES: enable fuse programming
 
 #generic avr flags
 set(AVR_CFLAGS "-ffunction-sections -fdata-sections" CACHE STRING "AVR compilation flags")
@@ -71,7 +72,7 @@ function(avr_add_executable_compilation EXECUTABLE)
 endfunction(avr_add_executable_compilation)
 
 function(avr_add_executable_upload ${EXECUTABLE})
-	set(AVR_PROGRAMMER_OPTIONS "")
+	set(AVR_PROGRAMMER_OPTIONS  -p ${AVR_MCU} -c ${AVR_PROGRAMMER})
 	
 	if(AVR_PROGRAMMER_BAUDRATE)
 		set(AVR_PROGRAMMER_OPTIONS ${AVR_PROGRAMMER_OPTIONS} -b ${AVR_PROGRAMMER_BAUDRATE})
@@ -88,13 +89,19 @@ function(avr_add_executable_upload ${EXECUTABLE})
 	# upload target
 	if(PROGRAM_EEPROM)
 		add_custom_target(upload_${EXECUTABLE} 
-			COMMAND ${AVRDUDE} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} ${AVR_PROGRAMMER_OPTIONS} -U flash:w:${EXECUTABLE}.hex -U eeprom:w:${EXECUTABLE}_eeprom.hex
+			COMMAND ${AVRDUDE} ${AVR_PROGRAMMER_OPTIONS} -U flash:w:${EXECUTABLE}.hex -U eeprom:w:${EXECUTABLE}_eeprom.hex
 			DEPENDS ${EXECUTABLE})
 	else(PROGRAM_EEPROM)
 		add_custom_target(upload_${EXECUTABLE} 
-			COMMAND ${AVRDUDE} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} ${AVR_PROGRAMMER_OPTIONS} -U flash:w:${EXECUTABLE}.hex
+			COMMAND ${AVRDUDE} ${AVR_PROGRAMMER_OPTIONS} -U flash:w:${EXECUTABLE}.hex
 			DEPENDS ${EXECUTABLE})
 	endif(PROGRAM_EEPROM)
+
+	if(AVR_FUSES)
+		string(REGEX REPLACE "([a-z]fuse):((0x)?[0-9a-f]+)" "-U\\1:w:\\2:m" AVR_FUSES "${AVR_FUSES}")
+		add_custom_target(fuses_${EXECUTABLE}
+			COMMAND ${AVRDUDE} ${AVR_PROGRAMMER_OPTIONS} ${AVR_FUSES})
+	endif(AVR_FUSES)
 endfunction(avr_add_executable_upload)
 
 function(avr_add_executable EXECUTABLE)

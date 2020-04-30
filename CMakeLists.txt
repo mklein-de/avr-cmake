@@ -16,6 +16,13 @@ set(AVR_PROGRAMMER_PORT /dev/ttyACM0)
 #set(AVR_PROGRAMMER_BAUDRATE 19200)
 set(PROGRAM_EEPROM False)
 
+# #device dependent config, here for usbasp on linux
+# set(AVR_MCU attiny44)
+# set(AVR_PROGRAMMER usbasp)
+# set(MCU_FREQ 128000L)
+# set(AVR_PROGRAMMER_BITCLOCK 16kHz)
+# set(AVR_FUSES lfuse:0xe4 hfuse:0xdf efuse:0xff)
+
 set(${Arduino_VARIANT} standard)
 find_package(Arduino REQUIRED COMPONENTS core_arduino)
 
