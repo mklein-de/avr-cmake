@@ -2,6 +2,7 @@
 
 # needs the following variables:
 # AVR_MCU : mcu type (eg atmega328p)
+# AVR_PART : (optional) part if for avrdude (defaults to ${AVR_MCU})
 # MCU_FREQ : clock frequency (defines F_CPU)
 # AVR_PROGRAMMER : programmer type for avrdude
 # AVR_PROGRAMMER_PORT : programmer port for avrdude (OS specific)
@@ -73,7 +74,11 @@ function(avr_add_executable_compilation EXECUTABLE)
 endfunction(avr_add_executable_compilation)
 
 function(avr_add_executable_upload ${EXECUTABLE})
-	set(AVR_PROGRAMMER_OPTIONS  -p ${AVR_MCU} -c ${AVR_PROGRAMMER})
+    if(DEFINED AVR_PART)
+        set(AVR_PROGRAMMER_OPTIONS  -p ${AVR_PART} -c ${AVR_PROGRAMMER})
+    else(DEFINED AVR_PART)
+        set(AVR_PROGRAMMER_OPTIONS  -p ${AVR_MCU} -c ${AVR_PROGRAMMER})
+    endif(DEFINED AVR_PART)
 	
 	if(AVR_PROGRAMMER_BAUDRATE)
 		set(AVR_PROGRAMMER_OPTIONS ${AVR_PROGRAMMER_OPTIONS} -b ${AVR_PROGRAMMER_BAUDRATE})
